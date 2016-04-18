@@ -1,8 +1,10 @@
 package com.github.phlank.cs346project5.view;
 
+import javax.swing.JComboBox;
+
 import com.github.phlank.cs346project5.model.QueryType;
 
-public class QueryTypeSelector extends javax.swing.JComboBox<QueryType> {
+public class QueryTypeSelector extends JComboBox<QueryType> {
 
 	private static final long serialVersionUID = 1636273198353865496L;
 

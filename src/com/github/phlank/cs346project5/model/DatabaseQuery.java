@@ -6,12 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DatabaseQuery {
+public final class DatabaseQuery {
 	
-	private static String serverName = "csor6.dhcp.bsu.edu";
-	private static String portNumber = "1521";
-	private static String sid = "or6db";
-	private static String url = "jdbc:oracle:thin:@" + serverName + ":" + portNumber + ":" + sid;
+	private static final String serverName = "csor6.dhcp.bsu.edu";
+	private static final String portNumber = "1521";
+	private static final String sid = "or6db";
+	private static final String url = "jdbc:oracle:thin:@" + serverName + ":" + portNumber + ":" + sid;
 	private static Connection connection;
 	private static Statement statement;
 	
@@ -21,9 +21,11 @@ public class DatabaseQuery {
 		statement = connection.createStatement();
 	}
 	
-	public static ResultSet query(String query) {
+	public static ResultSet queryDatabase(String query) {
 		try {
-			return statement.executeQuery("select * from siteuser");
+			statement = connection.createStatement();
+			ResultSet output = statement.executeQuery(query);
+			return output;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
