@@ -2,10 +2,16 @@ package com.github.phlank.cs346project5.view;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
 
 import com.github.phlank.cs346project5.model.DatabaseQuery;
 import com.github.phlank.cs346project5.model.QueryType;
 
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -45,25 +51,45 @@ public class GameReviewSiteExplorer extends JFrame {
 
 	}
 
+	private class QueryPanelBorder implements Border {
+
+		@Override
+		public Insets getBorderInsets(Component c) {
+			return new Insets(10, 10, 10, 10);
+		}
+
+		@Override
+		public boolean isBorderOpaque() {
+			return false;
+		}
+
+		@Override
+		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+			return;
+		}
+
+	}
+
 	private JPanel mainPanel;
 	private JPanel queryPanel;
 	private QueryTypeSelector queryTypeSelector;
 	private QueryType currentType = QueryType.SELECT_ALL;
 	private JButton submitButton;
 	private DatabaseQuery dbQuery;
+	private JTextArea queryTypeSelectorLabel = new JTextArea("Query type");
 
 	public GameReviewSiteExplorer() throws SQLException {
 		super();
 		dbQuery = new DatabaseQuery();
 		this.setVisible(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setSize(500, 500);
 		initializeQuerySelectors();
 		initializePanels();
 		updateQueryPanel();
 	}
 
 	private void initializeQuerySelectors() {
+		queryTypeSelectorLabel.setEditable(false);
 		queryTypeSelector = new QueryTypeSelector();
 		queryTypeSelector.addActionListener(new QueryTypeActionListener());
 		queryTypeSelector.setVisible(true);
@@ -73,10 +99,12 @@ public class GameReviewSiteExplorer extends JFrame {
 	private void initializePanels() {
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.add(queryTypeSelectorLabel);
 		mainPanel.add(queryTypeSelector);
 		mainPanel.setVisible(true);
 		queryPanel = new JPanel();
 		queryPanel.setLayout(new BoxLayout(queryPanel, BoxLayout.Y_AXIS));
+		queryPanel.setBorder(new QueryPanelBorder());
 		mainPanel.add(queryPanel);
 		submitButton = new JButton("Submit Query");
 		submitButton.addActionListener(new SubmitButtonActionListener());
@@ -96,39 +124,70 @@ public class GameReviewSiteExplorer extends JFrame {
 			updateSelectAll();
 			break;
 		case SUBSTRING_MATCHING:
-			//TODO: updateSubstringMatching()
+			updateSubstringMatching();
 			break;
-		case COUNT_ENTRIES:
-			//TODO: updateCountEntries()
+		case DISTINCT:
+			updateDistinct();
 			break;
 		case GROUPS:
-			//TODO: updateGroups()
+			// TODO: updateGroups()
 			break;
 		case MIN:
-			//TODO: updateMin()
+			// TODO: updateMin()
 			break;
 		case MAX:
-			//TODO: updateMax()
+			// TODO: updateMax()
 			break;
 		case AVG:
-			//TODO: updateAvg()
+			// TODO: updateAvg()
 			break;
 		case SUM:
-			//TODO: updateSum()
+			// TODO: updateSum()
 			break;
 		case SELECT_COL:
-			//TODO: updateSelectCol()
+			// TODO: updateSelectCol()
 			break;
 		case SORTING:
-			//TODO: updateSorting()
+			// TODO: updateSorting()
 			break;
 		}
+		this.pack();
 	}
 
 	private void updateSelectAll() {
 		queryPanel.removeAll();
+		JTextArea tableSelectorLabel = new JTextArea("Table:");
+		tableSelectorLabel.setEditable(false);
+		queryPanel.add(tableSelectorLabel);
 		queryPanel.add(new TableSelector());
-		queryPanel.repaint();
+	}
+
+	private void updateSubstringMatching() {
+		queryPanel.removeAll();
+		JTextArea tableSelectorLabel = new JTextArea("Table:");
+		TableSelector table0 = new TableSelector();
+		JTextArea propertySelectorLabel = new JTextArea("Property:");
+		TablePropertySelector property0 = new TablePropertySelector(table0);
+		JTextArea substringLabel = new JTextArea("Substring:");
+		JTextField substring = new JTextField();
+		queryPanel.add(tableSelectorLabel);
+		queryPanel.add(table0);
+		queryPanel.add(propertySelectorLabel);
+		queryPanel.add(property0);
+		queryPanel.add(substringLabel);
+		queryPanel.add(substring);
+	}
+
+	private void updateDistinct() {
+		queryPanel.removeAll();
+		JTextArea tableSelectorLabel = new JTextArea("Table:");
+		TableSelector table0 = new TableSelector();
+		JTextArea propertySelectorLabel = new JTextArea("Property:");
+		TablePropertySelector property0 = new TablePropertySelector(table0);
+		queryPanel.add(tableSelectorLabel);
+		queryPanel.add(table0);
+		queryPanel.add(propertySelectorLabel);
+		queryPanel.add(property0);
 	}
 
 	private void onSubmit() throws SQLException {
@@ -137,10 +196,18 @@ public class GameReviewSiteExplorer extends JFrame {
 		switch (currentType) {
 		case SELECT_ALL:
 			output = currentType
-					.query(newArrayList(((TableSelector) queryPanel.getComponent(0)).getSelectedItem().toString()));
-			System.out.println(queryPanel.getComponents()[0]);
-			System.out.println(((TableSelector) queryPanel.getComponent(0)).getSelectedItem().toString());
+					.query(newArrayList(((TableSelector) queryPanel.getComponent(1)).getSelectedItem().toString()));
 			break;
+		case SUBSTRING_MATCHING:
+			output = currentType
+					.query(newArrayList((((TableSelector) queryPanel.getComponent(1)).getSelectedItem().toString()),
+							((TablePropertySelector) queryPanel.getComponent(3)).getSelectedItem().toString(),
+							((JTextField) queryPanel.getComponent(5)).getText()));
+			break;
+		case DISTINCT:
+			output = currentType
+					.query(newArrayList(((TableSelector) queryPanel.getComponent(1)).getSelectedItem().toString(),
+							((TablePropertySelector) queryPanel.getComponent(3)).getSelectedItem().toString()));
 		default:
 			break;
 		}
@@ -153,7 +220,6 @@ public class GameReviewSiteExplorer extends JFrame {
 			siteExplorer = new GameReviewSiteExplorer();
 			siteExplorer.setVisible(true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

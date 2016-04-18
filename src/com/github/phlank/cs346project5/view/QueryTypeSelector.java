@@ -12,7 +12,7 @@ public class QueryTypeSelector extends JComboBox<QueryType> {
 		super();
 		this.addItem(QueryType.SELECT_ALL);
 		this.addItem(QueryType.SUBSTRING_MATCHING);
-		this.addItem(QueryType.COUNT_ENTRIES);
+		this.addItem(QueryType.DISTINCT);
 		this.addItem(QueryType.GROUPS);
 		this.addItem(QueryType.SORTING);
 		this.addItem(QueryType.SUM);

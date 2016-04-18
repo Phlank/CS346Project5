@@ -10,7 +10,7 @@ public enum QueryType {
 
 	SELECT_ALL("Select All"), //
 	SUBSTRING_MATCHING("Substring Match"), //
-	COUNT_ENTRIES("Count Entries"), //
+	DISTINCT("Distinct"), //
 	GROUPS("Groups by Entities"), //
 	SORTING("Sorting"), //
 	SUM("Sum"), //
@@ -37,9 +37,9 @@ public enum QueryType {
 		case ("Select All"):
 			return interpretResultSet(queryDatabase("select * from " + values[0]));
 		case ("Substring Match"):
-			break;
-		case ("Count Entries"):
-			break;
+			return interpretResultSet(queryDatabase("select * from " + values[0] + " where " + values[1] + " like '" + values[2] + "'"));
+		case ("Distinct"):
+			return interpretResultSet(queryDatabase("select distinct " + values[1] + " from " + values[0]));
 		case ("Groups by Entities"):
 			break;
 		case ("Sorting"):
